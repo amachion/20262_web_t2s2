@@ -1,6 +1,8 @@
 const express = require('express')
 const cors = require('cors')
 const mongoose = require('mongoose')
+const uniqueValidator = require('mongoose-unique-validator').default
+const bcrypt = require('bcrypt')
 const app = express()
 app.use(express.json())
 app.use(cors())
@@ -9,6 +11,13 @@ const Filme = mongoose.model("Filme", mongoose.Schema({
     titulo: {type: String}, 
     sinopse: {type: String}
 }))
+
+const usuarioSchema = mongoose.Schema ({
+    login: {type: String, required: true, unique: true},
+    password: {type: String, required: true}
+})
+usuarioSchema.plugin(uniqueValidator)
+const Usuario = mongoose.model("Usuario", usuarioSchema)
 
 async function conectarMongo() {
     await mongoose.connect(`mongodb+srv://andreiamachion_db_user:mongo123@cluster0.d7majmq.mongodb.net/`)
@@ -44,6 +53,41 @@ app.post('/filmes', async (req, res) => {
     await filme.save()
     const filmes = await Filme.find()
     res.json(filmes)
+})
+
+//post http://localhost:3000/signup
+app.post('/signup',  async (req, res) => {
+    try {
+        const login = req.body.login
+        const password = req.body.password
+        const criptografada = await bcrypt.hash(password, 10)
+        const usuario = new Usuario({
+            login: login,
+            password: criptografada
+        })
+        const respostaMongo = await usuario.save()
+        console.log(respostaMongo)
+        res.status(201).end()
+    }
+    catch (e) {
+        console.log(e)
+        res.status(409).end()
+    }
+})
+
+//post http://localhost:3000/login
+app.post('/login', async (req, res) => {
+    const login = req.body.login
+    const password = req.body.password
+    const usuario = await Usuario.findOne({login: login})
+    if (!usuario) {
+        return res.status(401).json({mensagem: "usuário não encontrado"})
+    }
+    const senhaValida = await bcrypt.compare(password, usuario.password)
+    if (!senhaValida) {
+        return res.status(401).json({mensagem: "senha inválida"})
+    }
+    res.end()
 })
 
 app.listen(3000, async () => {
