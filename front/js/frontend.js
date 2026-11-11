@@ -44,9 +44,10 @@ async function cadastrarFilme() {
             celulaTitulo.innerHTML = filme.titulo
             celulaSinopse.innerHTML = filme.sinopse
         }
+        exibirAlerta('.alert-cadastro-filme', "Filme cadastrado com sucesso", ['show', 'alert-success'], ['d-none', 'alert-danger'])
     }
     else {
-        exibirAlerta('.alert-cadastro-filme', "Preencha todos os campos", ['show', 'alert-danger'], ['d-none'], 2000)
+        exibirAlerta('.alert-cadastro-filme', "Preencha todos os campos", ['show', 'alert-danger'], ['d-none', 'alert-success'], 2000)
     }
 }
 async function cadastrarUsuario () {
@@ -61,7 +62,7 @@ async function cadastrarUsuario () {
             await axios.post (URLcompleta, {login: usuarioCadastro, password: passwordCadastro})
             usuarioCadastroInput.value = ""
             passwordCadastroInput.value = ""
-            exibirAlerta ('.alert-modal-cadastro', "Usuário cadastrado com sucesso", ['show', 'alert-success'], ['d-none', 'alert-danger'], timeout)
+            exibirAlerta ('.alert-modal-cadastro', "Usuário cadastrado com sucesso", ['show', 'alert-success'], ['d-none', 'alert-danger'], 2000)
             esconderModal ('#modalCadastro', 2000)
         }
         catch (e) {
