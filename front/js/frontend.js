@@ -75,6 +75,32 @@ async function cadastrarUsuario () {
     }
 }
 
+async function fazerLogin() {
+    let usuarioLoginInput = document.querySelector('#usuarioLoginInput')
+    let passwordLoginInput = document.querySelector('#passwordLoginInput')
+    let usuarioLogin = usuarioLoginInput.value
+    let passwordLogin = passwordLoginInput.value
+    if (usuarioLogin && passwordLogin) {
+        try {
+            const loginEndpoint = '/login'
+            const URLcompleta = `${protocolo}${baseURL}${loginEndpoint}`
+            usuarioLoginInput.value = ""
+            passwordLoginInput.value = ""
+            const resposta = await axios.post (URLcompleta, {login: usuarioLogin, password: passwordLogin})
+            localStorage.setItem('token', resposta.data.token)
+            exibirAlerta ('.alert-modal-login', "Login realizado com sucesso!", ['show', 'alert-success'], ['d-none', 'alert-danger'], 2000)
+            esconderModal ('#modalLogin', 2000)
+            prepararPagina()
+        }
+        catch (e) {
+            exibirAlerta('.alert-modal-login', "Problemas no login", ['show', 'alert-danger'], ['d-none', 'alert-success'], 2000)
+        }
+    }
+    else {
+        exibirAlerta('.alert-modal-login', "Preencha todos os campos", ['show', 'alert-danger'], ['d-none', 'alert-success'], 2000)
+    }
+}
+
 function exibirAlerta (seletor, innerHTML, classesToAdd, classesToRemove, timeout) {
     let alert = document.querySelector(seletor)
     alert.innerHTML = innerHTML
@@ -91,4 +117,18 @@ function esconderModal (seletor, timeout) {
         let modal = bootstrap.Modal.getInstance(document.querySelector(seletor))
         modal.hide()
     }, timeout)
+}
+
+function prepararPagina () {
+    const token = localStorage.getItem('token')
+    const loginLink = document.querySelector('#loginLink')
+    const cadastrarFilmeButton = document.querySelector('#cadastrarFilmeButton')
+    if (token) {
+        loginLink.innerHTML = "Logout"
+        cadastrarFilmeButton.disabled = false
+    }
+    else {
+        loginLink.innerHTML = "Login"
+        cadastrarFilmeButton.disabled = true
+    }
 }
