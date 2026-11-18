@@ -123,12 +123,32 @@ function prepararPagina () {
     const token = localStorage.getItem('token')
     const loginLink = document.querySelector('#loginLink')
     const cadastrarFilmeButton = document.querySelector('#cadastrarFilmeButton')
+    const novoUsuarioLink = document.querySelector('#novoUsuarioLink')
     if (token) {
         loginLink.innerHTML = "Logout"
         cadastrarFilmeButton.disabled = false
+        novoUsuarioLink.classList.add('d-none')
     }
     else {
         loginLink.innerHTML = "Login"
         cadastrarFilmeButton.disabled = true
+        novoUsuarioLink.classList.remove('d-none')
     }
+}
+function tratarLoginLogout () {
+    const token = localStorage.getItem('token')
+    if (token) {
+        fazerLogout()
+    }
+    else {
+        const modalLogin = bootstrap.Modal.getOrCreateInstance(
+            document.querySelector('#modalLogin')
+        )
+        modalLogin.show()
+    }
+}
+function fazerLogout() {
+    localStorage.removeItem('token')
+    prepararPagina()
+    exibirAlerta('.alert-cadastro-filme', 'Logout efetuado com sucesso!', ['show', 'alert-success'], ['d-none', 'alert-danger'], 2000)
 }
